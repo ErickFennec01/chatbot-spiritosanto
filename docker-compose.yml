@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  waha:
+    image: devlikeapro/waha:latest
+    container_name: waha_instance
+    ports:
+      - "8000:3000"
+    environment:
+      # Variaveis de ambiente para WAHA
+      WAHA_API_PORT: 3000
+      WAHA_PROFILE: default
+      WAHA_SESSIONS_PATH: /app/sessions
+      WAHA_WEBHOOK_URL: http://host.docker.internal:5000/webhook
+      WAHA_STORE_MESSAGES: "true"
+      WAHA_CHROME_ARGS: "--no-sandbox --disable-setuid-sandbox"
+    volumes:
+      - ./sessions:/app/sessions
+      - ./data:/app/data
+    restart: unless-stopped

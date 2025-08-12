@@ -1,0 +1,21 @@
+# Ambiente Virtual
+venv/
+
+# Pastas e arquivos do Python
+__pycache__/
+*.pyc
+
+# Pastas e arquivos do WAHA
+data/
+sessions/
+
+# Arquivos de bancos de dados locais
+conversations.db
+
+# Variáveis de ambiente
+.env
+
+# Arquivos de cache e temporários
+.DS_Store
+*.log
+*~
