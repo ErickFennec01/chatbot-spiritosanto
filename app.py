@@ -26,7 +26,7 @@ WAHA_URL = os.environ.get('WAHA_URL')
 if not WAHA_URL:
     raise ValueError("A variável de ambiente WAHA_URL não foi configurada.")
 
-MAX_HISTORY_MESSAGES = 10 
+MAX_HISTORY_MESSAGES = 10
 
 # --- FLUXO DE CONVERSA (MÁQUINA DE ESTADOS) ---
 STATE_MENU = "menu_principal"
@@ -48,7 +48,7 @@ STATE_GENERAL_CHAT = "chat_geral"
 
 # --- MENSAGENS PADRONIZADAS ---
 MENU_TEXT = """
-📋 𝑺𝒑𝒊𝒓𝒊𝒕𝒐 𝑺𝒂𝒏𝒕𝒐 - Menu de Opções
+📋 �𝒑𝒊𝒓𝒊𝒕𝒐 𝑺𝒂𝒏𝒕𝒐 - Menu de Opções
 1️⃣ Problemas com produto  
 2️⃣ Seja Franqueado  
 3️⃣ Virar Revendedor  
@@ -171,6 +171,7 @@ def set_user_state(chat_id, state, data=None):
         conn.commit()
         cursor.close()
         conn.close()
+
 def save_message(chat_id, sender, message):
     conn = get_db_connection()
     if conn:
@@ -198,6 +199,7 @@ def get_chat_history(chat_id):
     return history[::-1]
 
 def send_waha_message(chat_id, text):
+    """Envia uma mensagem de texto para o WAHA e adiciona logs detalhados."""
     payload_reply = {
         "session": "default",
         "chatId": chat_id,
@@ -205,7 +207,9 @@ def send_waha_message(chat_id, text):
     }
     headers = {"Content-Type": "application/json"}
     try:
-        requests.post(f"{WAHA_URL}/api/sendText", json=payload_reply, headers=headers)
+        response = requests.post(f"{WAHA_URL}/api/sendText", json=payload_reply, headers=headers)
+        response.raise_for_status()  # Lança uma exceção para status de erro (4xx ou 5xx)
+        print(f"Mensagem enviada com sucesso para {chat_id}. Status: {response.status_code}")
     except requests.exceptions.RequestException as e:
         print(f"Erro ao enviar mensagem para o WAHA: {e}")
 
@@ -270,7 +274,7 @@ def webhook():
                 send_waha_message(sender, ia_response)
                 send_waha_message(sender, MENU_TEXT)
                 save_message(sender, 'bot', ia_response)
-        
+            
         # Lógica de Franquia
         elif user_state.startswith("franquia"):
             current_q_num = int(user_state[-1])
@@ -289,7 +293,7 @@ def webhook():
                 # Opcional: Salvar o lead em outro lugar
                 send_waha_message(sender, MENU_TEXT)
                 set_user_state(sender, STATE_MENU)
-        
+            
         # Lógica de Revendedor
         elif user_state.startswith("revendedor"):
             current_q_num = int(user_state[-1])
@@ -315,3 +319,4 @@ def home():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
+�
